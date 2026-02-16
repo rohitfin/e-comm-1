@@ -1,8 +1,10 @@
 
 require('dotenv').config();
 const express = require("express");
-const userRoutes = require("./routers/userRoutes");
+const userRoutes = require("./routers/user.router");
 const connectDB = require("./configs/db.connection");
+const errorHandler = require("./middlewares/error.middleware");
+const ApiError = require("./utils/ApiError");
 
 const app = express();
 
@@ -27,14 +29,19 @@ app.use("/api/user", userRoutes);
 
 // 404 handler
 app.use((req, res, next) => {
-  res.status(404).json({ code: 404, message: "Not Found" });
+  next(new ApiError(404, "Route Not Found"));
 });
 
+// app.use((req, res, next) => {
+//   res.status(404).json({ code: 404, message: "Not Found" });
+// });
+
 // basic error handler
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ code: 500, message: "Internal Server Error" });
-});
+app.use(errorHandler);
+// app.use((err, req, res, next) => {
+//   console.error(err);
+//   res.status(500).json({ code: 500, message: "Internal Server Error" });
+// });
 
 app.listen(port, () => {
   console.log(`🚀 Server Running on http://localhost:${port}`);

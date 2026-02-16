@@ -19,14 +19,15 @@
   "homepage": "https://github.com/rohitfin/e-comm-1#readme",
   "description": "",
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.4",
     "express": "^5.2.1",
-    "mongoose": "^9.1.6",
-    "cors": "^2.8.5",
     "helmet": "^7.0.0",
+    "joi": "^18.0.2",
+    "mongoose": "^9.1.6",
     "morgan": "^1.10.0"
-  }
-  ,
+  },
   "devDependencies": {
     "nodemon": "^3.1.11"
   }

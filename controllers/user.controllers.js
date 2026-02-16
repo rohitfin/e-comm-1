@@ -1,5 +1,8 @@
 const { default: mongoose } = require("mongoose");
 const UserModel = require("../models/user.model");
+const bcrypt = require("bcrypt");
+const asyncHandler = require("../middlewares/asyncHandler");
+const userService = require("../services/user.service");
 
 const getUsers = async (req, res) => {
   try {
@@ -62,50 +65,93 @@ const getUserById = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    let { name, email, roleId, password, isActive, isDeleted } = req.body;
+    const { name, email, roleId, password } = req.body;
 
-    if (!name) {
+    // Basic Validation
+    if (!name || !email || !roleId) {
       return res.status(400).json({
         code: 400,
-        message: "Name field is missing",
+        message: "Required fields missing",
       });
-    }
-    if (!email) {
-      return res.status(400).json({
-        code: 400,
-        message: "Email field is missing",
-      });
-    }
-    if (!roleId) {
-      return res.status(400).json({
-        code: 400,
-        message: "RoleId field is missing",
-      });
-    }
-    if (isActive !== true && isActive !== false) {
-      return res.status(400).json({
-        code: 400,
-        message: "isActive field is missing",
-      });
-    }
-    if (isDeleted !== true && isDeleted !== false) {
-      isDeleted = false;
     }
 
-    let result = await UserModel.create(req.body);
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(roleId)) {
+      return res.status(400).json({
+        code: 400,
+        message: "Invalid roleId",
+      });
+    }
 
-    return res.status(200).json({
-      code: 200,
-      message: "User Created Successful",
-      data: result,
+    // Check duplicate email
+    const existingUser = await UserModel.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({
+        code: 409,
+        message: "Email already exists",
+      });
+    }
+
+    // Hash password (if provided)
+    let hashedPassword = null;
+    if (password) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+
+    const newUser = await UserModel.create({
+      name,
+      email,
+      roleId,
+      password: hashedPassword,
+      createdIP: req.ip,
+    });
+
+    return res.status(201).json({
+      code: 201,
+      message: "User created successfully",
+      data: newUser,
     });
   } catch (error) {
     return res.status(500).json({
       code: 500,
-      message: "Error",
+      message: "Internal server error",
       error: error.message,
     });
   }
 };
 
-module.exports = { getUsers, getUserById, createUser };
+const createUserFn = asyncHandler(async (req, res) => {
+  const user = await userService.createUser(req.body, req.ip);
+
+  res.status(201).json({
+    success: true,
+    message: "User created successfully",
+    data: user,
+  });
+});
+
+const updatePassword = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { password } = req.body;
+
+  const user = await userService.updatePassword(id, password);
+
+  res.status(200).json({
+    success: true,
+    message: "Password updated successfully",
+    data: user,
+  });
+});
+
+const getUserDetail = asyncHandler(async (req, res) => {
+  
+});
+
+module.exports = {
+  getUsers,
+  getUserById,
+  createUser,
+  createUserFn,
+  updatePassword,
+  getUserDetail,
+};
