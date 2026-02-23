@@ -144,7 +144,20 @@ const updatePassword = asyncHandler(async (req, res) => {
 });
 
 const getUserDetail = asyncHandler(async (req, res) => {
-  
+  let { _id } = req.body;
+
+  // Validate ObjectId
+  if (!mongoose.Types.ObjectId.isValid(_id)) {
+    throw new ApiError(400, "Invalid user ID");
+  }
+
+  const user = await userService.getUserDetailById(_id);
+
+  res.status(200).json({
+    success: true,
+    message: "User fetch successfully!",
+    data: user,
+  });
 });
 
 module.exports = {
