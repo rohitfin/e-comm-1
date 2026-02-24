@@ -1,8 +1,10 @@
-const { default: mongoose } = require("mongoose");
+// const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const UserModel = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const asyncHandler = require("../middlewares/asyncHandler");
 const userService = require("../services/user.service");
+const ApiError = require("../utils/ApiError");
 
 const getUsers = async (req, res) => {
   try {
@@ -134,6 +136,11 @@ const updatePassword = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { password } = req.body;
 
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ApiError(400, "Invalid user ID");
+  }
+
+
   const user = await userService.updatePassword(id, password);
 
   res.status(200).json({
@@ -160,6 +167,22 @@ const getUserDetail = asyncHandler(async (req, res) => {
   });
 });
 
+const deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ApiError(400, "Invalid user ID");
+  }
+
+  await userService.deleteUser(id);
+
+  res.status(200).json({
+    success: true,
+    message: "User deleted successfully!",
+  });
+
+});
+
 module.exports = {
   getUsers,
   getUserById,
@@ -167,4 +190,5 @@ module.exports = {
   createUserFn,
   updatePassword,
   getUserDetail,
+  deleteUser,
 };

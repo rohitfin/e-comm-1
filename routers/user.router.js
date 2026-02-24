@@ -6,7 +6,8 @@ const {
   createUser,
   createUserFn,
   updatePassword,
-  getUserDetail
+  getUserDetail,
+  deleteUser
 } = require("../controllers/user.controllers");
 const validateMiddleware = require("../middlewares/validate.middleware");
 const { createUserSchema } = require("../validators/user.validator");
@@ -14,13 +15,14 @@ const { createUserSchema } = require("../validators/user.validator");
 
 router.get("/", getUsers);
 router.get("/:id", getUserById);
-router.post("/create-user", createUser);
+router.post("/create", createUser);
 router.post(
-  "/create-new-user",
+  "/",
   validateMiddleware(createUserSchema),
   createUserFn,
 );
 router.put("/update-password/:id", updatePassword);
 router.post("/user-detail", getUserDetail);
+router.delete("/:id", deleteUser);
 
 module.exports = router;

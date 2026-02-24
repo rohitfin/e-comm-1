@@ -34,7 +34,7 @@ userSchema.pre("findOneAndUpdate", async function () {
 
   if (update.password.startsWith("$2b$")) return;
 
-  update.password = await bcrypt.hash(update.password, 10);
+  update.password = await bcrypt.hash(update.password, process.env.bcryptRound);
 });
 
 // Remove sensitive data from response

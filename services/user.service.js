@@ -12,9 +12,12 @@ exports.createUser = async (data, ip) => {
   const user = await User.create({
     ...data,
     createdIP: ip,
-  });
+  })
 
-  return user;
+  // const userObj = user.toObject();
+  // delete userObj.password;
+
+  return user;  // password auto-removed via toJSON
 };
 
 exports.updatePassword = async (userId, newPassword) => {
@@ -47,3 +50,18 @@ exports.getUserDetailById = async (userId) => {
     roleName: user.roleId?.name,
   };
 };
+
+exports.deleteUser = async(id)=>{
+  const user = await User.findByIdAndUpdate(
+    { _id: id, isDeleted: false }, // Prevent Double Delete
+    { isDeleted: true }, // setting
+    { new: true } //Return updated document
+  );
+
+  if (!user) {
+    throw new ApiError(404, "User not found or already deleted");
+  }
+
+  return user;
+
+}
