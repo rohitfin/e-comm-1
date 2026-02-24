@@ -1,10 +1,11 @@
 
 require('dotenv').config();
 const express = require("express");
-const userRoutes = require("./routers/user.router");
 const connectDB = require("./configs/db.connection");
 const errorHandler = require("./middlewares/error.middleware");
 const ApiError = require("./utils/ApiError");
+const userRoutes = require("./routers/user.router");
+const roleRoutes = require("./routers/role.router");
 
 const app = express();
 
@@ -26,6 +27,7 @@ const port = process.env.PORT || 3000;
 
 // router
 app.use("/api/user", userRoutes);
+app.use("/api/role", roleRoutes);
 
 // 404 handler
 app.use((req, res, next) => {
