@@ -4,10 +4,22 @@ const bcrypt = require("bcrypt");
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, require: true, trim: true },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true, match: [/^\S+@\S+\.\S+$/, "Invalid email format"] },
-    password: { type: String, select: false }, // hide password in response
-    
-    roleId: { type: mongoose.Schema.Types.ObjectId, ref: "tbl_roles", required: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true, // Use indexes for fields that are frequently searched or filtered.
+      match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
+    },
+    password: { type: String, minlength: 6, select: false }, // hide password in response
+
+    roleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "tbl_roles",
+      required: true,
+    },
 
     isActive: { type: Boolean, default: true },
     isDeleted: { type: Boolean, default: false },
@@ -23,19 +35,44 @@ const userSchema = new mongoose.Schema(
 userSchema.pre("save", async function () {
   if (!this.isModified("password") || !this.password) return;
 
-  this.password = await bcrypt.hash(this.password, 10);
+  const rounds = parseInt(process.env.BCRYPT_ROUNDS, 10) || 10;
+  this.password = await bcrypt.hash(this.password, rounds);
 });
 
-// Update hook
+// Hash password on update
 userSchema.pre("findOneAndUpdate", async function () {
   const update = this.getUpdate();
 
-  if (!update.password) return;
+  if (!update) return;
 
-  if (update.password.startsWith("$2b$")) return;
+  const password = update.password || (update.$set && update.$set.password);
 
-  update.password = await bcrypt.hash(update.password, process.env.bcryptRound);
+  if (!password) return;
+
+  if (password.startsWith("$2b$")) return;
+
+  const rounds = parseInt(process.env.BCRYPT_ROUNDS, 10) || 10;
+  const hashed = await bcrypt.hash(password, rounds);
+
+  if (update.password) update.password = hashed;
+  if (update.$set) update.$set.password = hashed;
 });
+
+// userSchema.pre("findOneAndUpdate", async function () {
+//   const update = this.getUpdate();
+
+//   if (!update || !update.password) return;
+
+//   if (typeof update.password === 'string' && update.password.startsWith("$2b$")) return;
+
+//   const rounds = parseInt(process.env.BCRYPT_ROUNDS, 10) || 10;
+//   update.password = await bcrypt.hash(update.password, rounds);
+// });
+
+// compare password
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 // Remove sensitive data from response
 userSchema.methods.toJSON = function () {
@@ -47,5 +84,3 @@ userSchema.methods.toJSON = function () {
 
 const user = mongoose.model("tbl_users", userSchema);
 module.exports = user;
-
-

@@ -4,25 +4,25 @@ const {
   getUsers,
   getUserById,
   createUser,
-  createUserFn,
   updatePassword,
   getUserDetail,
-  deleteUser
+  deleteUser,
 } = require("../controllers/user.controllers");
+const validateId = require("../middlewares/validateId.middleware");
 const validateMiddleware = require("../middlewares/validate.middleware");
 const { createUserSchema } = require("../validators/user.validator");
-// const userController = require("../controllers/user.controllers");
+const { authProtect } = require("../middlewares/auth.middleware");
+const { authorize } = require("../middlewares/role.middleware");
 
-router.get("/", getUsers);
-router.get("/:id", getUserById);
-router.post("/create", createUser);
+router.get("/", authProtect, authorize("admin"), getUsers);
+router.get("/:id", validateId, getUserById);
 router.post(
   "/",
   validateMiddleware(createUserSchema),
-  createUserFn,
+  createUser,
 );
-router.put("/update-password/:id", updatePassword);
-router.post("/user-detail", getUserDetail);
-router.delete("/:id", deleteUser);
+router.put("/update-password/:id", validateId, updatePassword);
+router.get("/detail/:id", validateId, getUserDetail);
+router.delete("/:id", authProtect, authorize("admin"), validateId, deleteUser);
 
 module.exports = router;

@@ -1,31 +1,34 @@
-
-require('dotenv').config();
+require("dotenv").config();
 const express = require("express");
 const connectDB = require("./configs/db.connection");
 const errorHandler = require("./middlewares/error.middleware");
 const ApiError = require("./utils/ApiError");
 const userRoutes = require("./routers/user.router");
 const roleRoutes = require("./routers/role.router");
+const authRoutes = require("./routers/auth.router");
 
 const app = express();
 
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
+// If running behind a proxy (nginx, load balancer), trust proxy to get correct IP
+app.set("trust proxy", true); // app.set('trust proxy', 1);
+
+const cors = require("cors"); // allow cross origin user can access api
+const helmet = require("helmet"); // setting various HTTP security headers
+const morgan = require("morgan"); // logs HTTP requests in the console.
 
 // middle ware
 app.use(express.json());
 app.use(helmet());
 app.use(cors());
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 
 // DB connection
 connectDB();
 
 const port = process.env.PORT || 3000;
 
-
 // router
+app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/role", roleRoutes);
 
