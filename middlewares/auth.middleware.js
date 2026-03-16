@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const ApiError = require("../utils/ApiError");
+const ApiError = require("../utils/apiError");
 const LoginSession = require("../models/loginSession.model");
 
 exports.authProtect = async (req, res, next) => {

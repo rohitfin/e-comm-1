@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 const LoginSession = require("../models/loginSession.model");
-const ApiError = require("../utils/ApiError");
+const ApiError = require("../utils/apiError");
 
 exports.login = async (email, password, req) => {
   const user = await User.findOne({ email })

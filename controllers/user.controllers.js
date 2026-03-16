@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const UserModel = require("../models/user.model");
 const asyncHandler = require("../middlewares/asyncHandler");
 const userService = require("../services/user.service");
-const ApiError = require("../utils/ApiError");
+const ApiError = require("../utils/apiError");
 
 const getUsers = asyncHandler(async (req, res) => {
   const users = await UserModel.find({}).lean();

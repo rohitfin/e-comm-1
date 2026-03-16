@@ -1,9 +1,10 @@
 const User = require("../models/user.model");
-const ApiError = require("../utils/ApiError");
+const ApiError = require("../utils/apiError");
 const Role = require("../models/role.model");
+const userRepository = require("../repositories/user.repository");
 
 exports.createUser = async (data, ip) => {
-  const existingUser = await User.findOne({ email: data.email });
+  const existingUser = await userRepository.findByEmail(data.email);
 
   if (existingUser) {
     throw new ApiError(409, "Email already exists");
@@ -21,21 +22,22 @@ exports.createUser = async (data, ip) => {
 };
 
 exports.updatePassword = async (userId, newPassword) => {
-  const user = await User.findById(userId);
+  // const user = await userRepository.findById(userId);
+  const user = await userRepository.updatePassword(userId);
 
   if (!user) {
     throw new ApiError(404, "User not found");
   }
 
-  user.password = newPassword;
+  // user.password = newPassword;
 
-  await user.save(); // triggers pre("save") hook
+  // await user.save(); // triggers pre("save") hook
 
   return user;
 };
 
 exports.getUserDetailById = async (userId) => {
-  const user = await User.findById(userId)
+  const user = await userRepository.findById(userId)
     .populate("roleId", "name")
     .select("-email -__v") // not comes on response
     .lean();
@@ -52,11 +54,13 @@ exports.getUserDetailById = async (userId) => {
 };
 
 exports.deleteUser = async(id)=>{
-  const user = await User.findByIdAndUpdate(
-    { _id: id, isDeleted: false }, // Prevent Double Delete
-    { isDeleted: true }, // setting
-    { new: true } //Return updated document
-  );
+  // const user = await User.findByIdAndUpdate(
+  //   { _id: id, isDeleted: false }, // Prevent Double Delete
+  //   { isDeleted: true }, // setting
+  //   { new: true } //Return updated document
+  // );
+
+  const user = await userRepository.softDelete(userId);
 
   if (!user) {
     throw new ApiError(404, "User not found or already deleted");

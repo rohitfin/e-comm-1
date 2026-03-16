@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const ApiError = require('../utils/ApiError');
+const ApiError = require('../utils/apiError');
 
 const validateId = (req, res, next) => {
   const { id } = req.params;

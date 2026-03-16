@@ -1,5 +1,5 @@
 const RoleModel = require("../models/role.model");
-const ApiError = require("../utils/ApiError");
+const ApiError = require("../utils/apiError");
 
 exports.getRoles = async () => {
   return await RoleModel.select("-__v").lean();

@@ -1,4 +1,4 @@
-const ApiError = require("../utils/ApiError");
+const ApiError = require("../utils/apiError");
 
 const validateMiddleware = (schema) => (req, res, next) => {
   const { error, value } = schema.validate(req.body, {

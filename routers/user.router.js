@@ -18,6 +18,7 @@ router.get("/", authProtect, authorize("admin"), getUsers);
 router.get("/:id", validateId, getUserById);
 router.post(
   "/",
+  authProtect,
   validateMiddleware(createUserSchema),
   createUser,
 );

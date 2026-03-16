@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const connectDB = require("./configs/db.connection");
 const errorHandler = require("./middlewares/error.middleware");
-const ApiError = require("./utils/ApiError");
+const ApiError = require("./utils/apiError");
 const userRoutes = require("./routers/user.router");
 const roleRoutes = require("./routers/role.router");
 const authRoutes = require("./routers/auth.router");

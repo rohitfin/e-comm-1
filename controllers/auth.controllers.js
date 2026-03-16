@@ -1,5 +1,5 @@
 const asyncHandler = require("../middlewares/asyncHandler");
-const ApiError = require("../utils/ApiError");
+const ApiError = require("../utils/apiError");
 const authService = require("../services/auth.service");
 const LoginSession = require("../models/loginSession.model");
 
