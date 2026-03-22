@@ -16,7 +16,23 @@ const loginSessionSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
-  }
+  },
+  refreshToken: {
+    type: String,
+    required: true
+  },
+  refreshTokenExpiryAt:{
+    type: String,
+    required: true
+  },
+  accessTokenExpiryAt:{
+    type: String,
+    required: true
+  },
+  lastActivity: {
+    type: Date,
+    default: Date.now
+  },
 });
 
 module.exports = mongoose.model("tbl_login_sessions", loginSessionSchema);

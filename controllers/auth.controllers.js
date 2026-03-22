@@ -6,7 +6,7 @@ const LoginSession = require("../models/loginSession.model");
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  if(!email || !password){
+  if (!email || !password) {
     throw new ApiError(401, "Email or password is incorrect");
   }
 
@@ -20,19 +20,28 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const logout = asyncHandler(async (req, res) => {
-
   const sessionId = req.user.sessionId;
 
   await LoginSession.findByIdAndUpdate(sessionId, {
     isActive: false,
-    logoutTime: new Date()
+    logoutTime: new Date(),
   });
 
   res.status(200).json({
     success: true,
-    message: "Logged out successfully"
+    message: "Logged out successfully",
   });
-
 });
 
-module.exports = { login, logout };
+const refreshToken = asyncHandler(async (req, res) => {
+  const sessionId = req.user.sessionId;
+  const data = await authService.refreshToken(req, sessionId);
+
+  res.status(200).json({
+    success: true,
+    message: "New token is generated successfully",
+    data,
+  });
+});
+
+module.exports = { login, logout, refreshToken };
