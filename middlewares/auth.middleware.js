@@ -17,12 +17,13 @@ exports.authProtect = async (req, res, next) => {
     const session = await LoginSession.findOne({
       _id: decoded.sessionId,
       isActive: true,
-    });
+    }).select("_id userId isActive"); // limits which fields are returned from DB
 
     if (!session) {
       throw new ApiError(401, "Session expired");
     }
 
+    req.session = session;
     req.user = decoded; // attach user info
     next();
   } catch (error) {

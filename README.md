@@ -1,271 +1,3 @@
-# E-Commerce API v1.0.0
-
-A robust, production-ready Node.js backend application for e-commerce platforms with authentication, user management, and role-based access control.
-
----
-
-## 📋 Table of Contents
-- [Project Overview](#project-overview)
-- [Architecture](#architecture)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Installation & Setup](#installation--setup)
-- [Environment Variables](#environment-variables)
-- [Project Structure](#project-structure)
-- [API Endpoints](#api-endpoints)
-- [Authentication & Authorization](#authentication--authorization)
-- [Improvements & Recommendations](#improvements--recommendations)
-- [Future Roadmap](#future-roadmap)
-
----
-
-## 📖 Project Overview
-
-This is a scalable Node.js backend application built with Express.js and MongoDB, designed for e-commerce platforms. The application implements:
-
-- **User Authentication** with JWT tokens and session management
-- **Role-Based Access Control (RBAC)** for different user types (admin, customer, etc.)
-- **User Management** with CRUD operations
-- **Role Management** for defining permissions
-- **Session Tracking** to monitor active user sessions
-- **Security Best Practices** with helmet, bcrypt password hashing, and input validation
-
-The application follows a clean, layered architecture separating concerns into controllers, services, models, and middleware, making it maintainable and testable.
-
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────┐
-│           Express Server (Port 3000)            │
-├─────────────────────────────────────────────────┤
-│                    Routes                       │
-│  ├─ /api/auth (Authentication)                  │
-│  ├─ /api/user (User Management)                 │
-│  └─ /api/role (Role Management)                 │
-├─────────────────────────────────────────────────┤
-│                  Middleware                     │
-│  ├─ Error Handler (error.middleware.js)        │
-│  ├─ Auth Protect (auth.middleware.js)          │
-│  ├─ Role Authorization (role.middleware.js)    │
-│  ├─ Input Validation (validate.middleware.js)  │
-│  └─ Async Handler (asyncHandler.js)            │
-├─────────────────────────────────────────────────┤
-│              Controllers & Services             │
-│  ├─ auth.controllers ↔ auth.service            │
-│  ├─ user.controllers ↔ user.service            │
-│  └─ role.controllers ↔ role.service            │
-├─────────────────────────────────────────────────┤
-│                 MongoDB Models                  │
-│  ├─ User (tbl_users)                           │
-│  ├─ Role (tbl_roles)                           │
-│  └─ LoginSession (tbl_login_sessions)          │
-├─────────────────────────────────────────────────┤
-│                   MongoDB                       │
-└─────────────────────────────────────────────────┘
-```
-
----
-
-## ✨ Features
-
-### Authentication & Security
-- ✅ User login with email and password
-- ✅ JWT token-based authentication
-- ✅ Session management with login/logout tracking
-- ✅ Password hashing with bcrypt
-- ✅ Token expiration (24 hours)
-- ✅ IP address and User-Agent logging for security auditing
-- ✅ Security headers with Helmet
-- ✅ CORS enabled for cross-origin requests
-
-### User Management
-- ✅ Create users with role assignment
-- ✅ Get all users (admin only)
-- ✅ Get user details by ID
-- ✅ Update user password
-- ✅ Soft delete users
-- ✅ Track user creation/modification metadata (who, when, IP)
-
-### Role Management
-- ✅ Create roles
-- ✅ List all roles
-- ✅ Update role information
-- ✅ Delete roles
-- ✅ Role-based access control (RBAC)
-
-### API Features
-- ✅ Comprehensive error handling with custom ApiError class
-- ✅ Input validation with Joi
-- ✅ Request logging with Morgan
-- ✅ Async/await error handling
-- ✅ RESTful API design
-
----
-
-## 🛠️ Tech Stack
-
-| Technology | Purpose | Version |
-|-----------|---------|---------|
-| **Express** | Web Framework | ^5.2.1 |
-| **MongoDB** | NoSQL Database | - |
-| **Mongoose** | ODM for MongoDB | ^9.1.6 |
-| **JWT** | Authentication | ^9.0.3 |
-| **Bcrypt** | Password Hashing | ^6.0.0 |
-| **Joi** | Input Validation | ^18.0.2 |
-| **Helmet** | Security Headers | ^7.0.0 |
-| **CORS** | Cross-Origin Support | ^2.8.5 |
-| **Morgan** | Request Logging | ^1.10.0 |
-| **Dotenv** | Environment Variables | ^17.2.4 |
-| **Nodemon** | Development Auto-reload | ^3.1.11 |
-
----
-
-## 📦 Installation & Setup
-
-### Prerequisites
-- Node.js >= 14.x
-- npm or yarn
-- MongoDB instance running locally or cloud (MongoDB Atlas)
-
-### Steps
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/rohitfin/e-comm-1.git
-   cd e-comm-1
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Create `.env` file** (see Environment Variables section)
-   ```bash
-   cp .env.example .env
-   ```
-
-4. **Start the server**
-   ```bash
-   # Development mode with auto-reload
-   npm run dev
-
-   # Production mode
-   npm start
-   ```
-
-5. **Server will be running at** `http://localhost:3000`
-
----
-
-## 🔑 Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```env
-# Server Configuration
-PORT=3000
-
-# Database Configuration
-MONGO_URL=mongodb+srv://username:password@cluster.mongodb.net/e-comm-1?retryWrites=true&w=majority
-
-# JWT Configuration
-JWT_SECRET=your_jwt_secret_key_here_make_it_long_and_random
-
-# Bcrypt Configuration
-BCRYPT_ROUNDS=10
-
-# Optional: For production
-NODE_ENV=development
-```
-
-### Important Notes:
-- `JWT_SECRET`: Use a strong, random string (min 32 characters)
-- `BCRYPT_ROUNDS`: Higher values = more secure but slower (10-12 recommended)
-- `MONGO_URL`: Use MongoDB Atlas for cloud or local MongoDB URI
-
----
-
-## 📂 Project Structure
-
-```
-e-comm-1/
-├── server.js                    # Entry point, Express app initialization
-├── package.json                 # Dependencies and scripts
-├── .env                         # Environment variables (create this)
-├── .gitignore                   # Git ignore rules
-│
-├── configs/
-│   └── db.connection.js        # MongoDB connection logic
-│
-├── models/                      # Mongoose schemas
-│   ├── user.model.js           # User schema with password hashing
-│   ├── role.model.js           # Role schema
-│   └── loginSession.model.js   # Session tracking schema
-│
-├── controllers/                 # Request handlers
-│   ├── auth.controllers.js      # Login/logout logic
-│   ├── user.controllers.js      # User CRUD operations
-│   └── role.controllers.js      # Role CRUD operations
-│
-├── services/                    # Business logic
-│   ├── auth.service.js         # Authentication logic
-│   ├── user.service.js         # User service
-│   └── role.service.js         # Role service
-│
-├── routers/                     # API route definitions
-│   ├── auth.router.js          # Auth endpoints
-│   ├── user.router.js          # User endpoints
-│   └── role.router.js          # Role endpoints
-│
-├── middlewares/                 # Express middleware
-│   ├── auth.middleware.js       # JWT verification
-│   ├── role.middleware.js       # Role-based authorization
-│   ├── error.middleware.js      # Global error handler
-│   ├── validate.middleware.js   # Input validation
-│   ├── validateId.middleware.js # ObjectId validation
-│   └── asyncHandler.js          # Async error wrapper
-│
-├── validators/                  # Input validation schemas (Joi)
-│   ├── user.validator.js        # User validation rules
-│   └── role.validator.js        # Role validation rules
-│
-└── utils/
-    └── ApiError.js             # Custom error class
-```
-
----
-
-## 🔌 API Endpoints
-
-### Authentication Endpoints
-```
-POST   /api/auth/login           - User login (email + password)
-GET    /api/auth/logout          - User logout (requires auth)
-```
-
-### User Endpoints
-```
-GET    /api/user/                - Get all users (admin only)
-GET    /api/user/:id             - Get user by ID
-GET    /api/user/detail/:id      - Get detailed user info
-POST   /api/user/                - Create new user
-PUT    /api/user/update-password/:id - Update user password
-DELETE /api/user/:id             - Delete user (admin only)
-```
-
-### Role Endpoints
-```
-GET    /api/role/                - Get all roles
-POST   /api/role/                - Create new role
-PUT    /api/role/:id             - Update role
-DELETE /api/role/:id             - Delete role
-```
-
----
-
 ## 🔐 Authentication & Authorization
 
 ### Login Flow
@@ -482,25 +214,529 @@ curl -X POST http://localhost:3000/api/user/ \
 
 ---
 
-## 📄 License
+/*
+SECTION 1 — Authentication & Security
+1️⃣ Login API
+  Build a login API.
+  Requirements:
+    •	Validate email + password - ✅
+    •	Generate JWT access token - ✅
+    •	Generate refresh token - ✅ (Before generate check if session is already create for this user then make it isActive false)
+    •	Create login session - ✅
+  •	Save:
+    o	IP address
+    o	device
+    o	browser
+    o	refresh token expiry
+  •	Return:
+    {
+      "token": "",
+      "refreshToken": "",
+      "user": {}
+    }
+  Edge cases:
+    •	inactive user
+    •	deleted user
+    •	wrong password
+    •	multiple device login
+________________________________________
+2️⃣ Refresh Token API
+Create:
+  POST /auth/refresh-token - ✅
+  Requirements:
+    •	Validate refresh token - ✅
+    •	Verify session - ✅
+    •	Issue new access token - ✅
+    •	Update session lastActivity - ✅
+  Security:
+    •	Refresh token rotation
+________________________________________
+3️⃣ Logout API
+  POST /auth/logout - ✅
+    Requirements: - ✅
+      •	invalidate session - ✅
+      •	update logoutTime - ✅
+      •	set isActive=false - ✅
+________________________________________
+4️⃣ Logout All Devices
+  POST /auth/logout-all
+  Invalidate all sessions of the user.
+  ________________________________________
+5️⃣ Middleware
+  Build middleware:
+  authProtect
+  Must validate:
+    •	JWT
+    •	session active
+    •	user active
+________________________________________
+6️⃣ Role Based Authorization
+    Create middleware:
+    authorize("admin")
+    authorize("seller")
+    authorize("customer")
+    Example:
+    DELETE /users/:id
+    Admin only
+________________________________________
+SECTION 2 — User Management
+7️⃣ Admin Create User
+    Admin can create:
+    •	seller
+    •	customer
+    Validation:
+    •	unique email
+    •	roleId must exist
+________________________________________
+8️⃣ Get Users with Filters
+    GET /users
+    Support:
+    •	pagination
+    •	role filter
+    •	search by email/name
+    •	active users
+    Example:
+    /users?page=1&limit=10&role=seller&search=rohit
+________________________________________
+9️⃣ Soft Delete User
+    Instead of deleting:
+    isDeleted = true
+    User cannot login anymore.
+________________________________________
+SECTION 3 — Product APIs
+🔟 Seller Create Product
+    POST /products
+    Rules:
+    •	seller can only create products for themselves
+    •	validate category
+    •	price > 0
+________________________________________
+11️⃣ Product Listing API
+    GET /products
+    Filters:
+    •	category
+    •	price range
+    •	seller
+    •	pagination
+    •	sorting
+    Example:
+    /products?category=electronics&minPrice=500&maxPrice=50000
+________________________________________
+12️⃣ Product Detail API
+    GET /products/:id
+    Return:
+    •	product
+    •	category
+    •	seller
+    •	inventory
+________________________________________
+13️⃣ Update Product
+    Only seller who created it can update.
+________________________________________
+14️⃣ Delete Product
+    Soft delete product.
+________________________________________
+SECTION 4 — Inventory
+    15️⃣ Inventory API
+    GET /inventory/:productId
+    Return stock.
+________________________________________
+16️⃣ Update Inventory
+    PATCH /inventory/:productId
+    Seller can update stock.
+    Edge cases:
+    •	stock cannot be negative
+________________________________________
+17️⃣ Low Stock Alert API
+    Return products where:
+    stock < 10
+________________________________________
+SECTION 5 — Cart System
+18️⃣ Add to Cart
+    POST /cart/add
+    Rules:
+    •	user must be customer
+    •	check product exists
+    •	check stock available
+________________________________________
+19️⃣ Update Cart Item
+    PATCH /cart/item/:id
+    Update quantity.
+________________________________________
+20️⃣ Remove Cart Item
+    DELETE /cart/item/:id   
+________________________________________
+21️⃣ Get Cart
+    GET /cart
+    Return:
+    •	product details
+    •	quantity
+    •	price
+    •	subtotal
+________________________________________
+22️⃣ Cart Total Calculation
+    Return:
+    subtotal
+    tax
+    grandTotal
+________________________________________
+SECTION 6 — Order System
+23️⃣ Place Order
+    POST /orders
+    Flow:
+    cart → order
+    Steps:
+    1.	validate cart
+    2.	check inventory
+    3.	create order
+    4.	create order_items
+    5.	reduce stock
+    6.	clear cart
+________________________________________
+24️⃣ Get My Orders
+    GET /orders/my
+    Customer only.
+________________________________________
+25️⃣ Order Detail API
+GET /orders/:id
+    Return:
+    •	items
+    •	address
+    •	total
+    •	status
+________________________________________
+26️⃣ Update Order Status
+    Admin or seller:
+    PATCH /orders/:id/status
+    Example:
+    PLACED → SHIPPED → DELIVERED
+________________________________________
+27️⃣ Cancel Order
+    Rules:
+    •	only before shipped
+    •	restore inventory
+________________________________________
+SECTION 7 — Address System
+28️⃣ Add Address
+    POST /addresses
+    User can add multiple.
+________________________________________
+29️⃣ Set Default Address
+    Only one address per user can be:
+    isDefault=true
+________________________________________
+SECTION 8 — Advanced Production Questions
+30️⃣ Prevent Double Order
+    If user clicks place order twice.
+    Solution?
+    Implement:
+    idempotency
+________________________________________
+31️⃣ Prevent Overselling
+    Two users buying last item simultaneously.
+    Solution?
+    Use:
+    transactions
+    or
+    atomic stock update
+________________________________________
+32️⃣ Product Search Optimization
+    Implement:
+    MongoDB text index
+________________________________________
+33️⃣ Rate Limiting
+    Protect login API.
+    Use:
+    express-rate-limit
+________________________________________
+34️⃣ Logging System
+    Implement logging using:
+    winston
+    Log:
+    •	errors
+    •	login attempts
+    •	orders
+________________________________________
+35️⃣ API Response Standardization
+    Return consistent format:
+    {
+    "success": true,
+    "message": "",
+    "data": {}
+    }
+________________________________________
+SECTION 9 — System Design Questions
+Explain how you would implement:
+36️⃣ Product Reviews
+37️⃣ Wishlist
+38️⃣ Coupon System
+39️⃣ Payment Gateway Integration
+40️⃣ Order Tracking
+________________________________________
+SECTION 10 — Performance Questions
+Explain how to handle:
+41️⃣ 1 million users
+42️⃣ 100k products
+43️⃣ heavy traffic sale event
+________________________________________
+BONUS HARD QUESTIONS (Senior Level)
+44️⃣ Microservice design for this system
+45️⃣ Event driven order processing
+46️⃣ Distributed inventory management
+47️⃣ Prevent fraud orders
+48️⃣ Cache product listing using Redis
 
-This project is licensed under the ISC License - see the package.json file for details.
 
----
 
-## 🔗 Repository
 
-- **GitHub**: [rohitfin/e-comm-1](https://github.com/rohitfin/e-comm-1)
-- **Issues**: [Report Issues](https://github.com/rohitfin/e-comm-1/issues)
 
----
 
-## 📧 Support
 
-For questions or issues, please open an issue on the GitHub repository.
 
----
 
-**Last Updated**: March 2026  
-**Status**: Active Development  
-**Version**: 1.0.0
+
+1️⃣ Atomic Checkout Challenge (Most Important)
+Problem
+Implement:
+POST /checkout
+Flow:
+cart → order → order_items → inventory update → cart clear
+Tricky Requirements
+1.	If inventory fails, order must not be created.
+2.	If order fails, inventory must not reduce.
+3.	If network retry happens, order must not duplicate.
+4.	If user clicks checkout twice, still only one order.
+Must use
+MongoDB transactions
+idempotency keys
+________________________________________
+2️⃣ Inventory Overselling Challenge
+Scenario
+Inventory:
+product stock = 1
+Two customers:
+Customer A checkout
+Customer B checkout
+Both succeed.
+Stock becomes:
+-1
+Challenge
+Design inventory update so overselling never happens.
+Hint
+Atomic update:
+$inc: { stock: -1 }
+with condition:
+stock > 0
+________________________________________
+3️⃣ Cart Price Manipulation Attack
+Scenario
+Frontend sends:
+{
+ "productId": "123",
+ "price": 100
+}
+But real price:
+799
+Challenge
+Ensure backend never trusts client price.
+Solution expectation
+Server must always:
+fetch price from DB
+________________________________________
+4️⃣ Double Cart Item Problem
+Scenario
+User sends:
+POST /cart/add
+productId=123
+twice.
+Cart becomes:
+productId=123
+productId=123
+Challenge
+Instead it should become:
+quantity: 2
+________________________________________
+5️⃣ Seller Product Ownership
+Scenario
+Seller A tries:
+PATCH /products/{sellerBProduct}
+Challenge
+Prevent cross-seller modification.
+Hint
+Verify:
+product.sellerId === req.user.id
+________________________________________
+6️⃣ Session Hijacking Detection
+Scenario
+User logs in from:
+Mumbai
+Chrome
+Next request:
+Germany
+Firefox
+Challenge
+Detect suspicious login.
+Possible solution:
+compare IP + device
+________________________________________
+7️⃣ Order Cancellation Race Condition
+Scenario
+Two requests:
+POST /orders/123/cancel
+POST /orders/123/cancel
+Inventory restored twice.
+Challenge
+Prevent double restore.
+Hint
+Check order status:
+if status !== PLACED
+throw error
+________________________________________
+8️⃣ Pagination Trap
+Scenario
+Database has:
+100000 products
+API:
+GET /products?page=1
+Challenge
+Implement efficient pagination.
+Expected:
+limit
+skip
+index
+Bonus:
+cursor pagination
+________________________________________
+9️⃣ Search Optimization
+Problem
+Implement:
+GET /products/search?q=iphone
+Challenge
+Handle:
+100k products
+Expected
+Mongo index:
+db.products.createIndex({ name: "text" })
+________________________________________
+🔟 Global Soft Delete Protection
+Your models have:
+isDeleted
+Challenge
+Ensure deleted records never appear in queries.
+Expected solution:
+mongoose query middleware
+________________________________________
+1️⃣1️⃣ Prevent Cart Checkout After Stock Change
+Scenario
+User adds item:
+stock = 5
+Before checkout stock becomes:
+0
+Challenge
+Checkout must fail.
+________________________________________
+1️⃣2️⃣ Rate Limit Login API
+Prevent brute force.
+POST /auth/login
+Limit:
+5 attempts / minute
+________________________________________
+1️⃣3️⃣ Order Total Integrity
+Scenario
+User modifies request:
+{
+ "totalAmount": 10
+}
+Actual total:
+80799
+Challenge
+Prevent manipulation.
+Expected:
+recalculate total on server
+________________________________________
+1️⃣4️⃣ Prevent Massive Cart Size
+User adds:
+10000 items
+Challenge
+Limit cart size.
+Example:
+max 50 items
+________________________________________
+1️⃣5️⃣ Transaction Failure Recovery
+Scenario
+Server crashes during checkout.
+inventory reduced
+order not created
+Challenge
+Design system to prevent inconsistency.
+Expected:
+transactions
+________________________________________
+1️⃣6️⃣ Multi Device Session Management
+User logs in from:
+Laptop
+Mobile
+Tablet
+Challenge
+Implement:
+GET /sessions
+Return active devices.
+Allow:
+logout specific session
+________________________________________
+1️⃣7️⃣ Order Status Validation
+Prevent invalid transitions:
+Invalid:
+DELIVERED → PLACED
+Expected solution
+state machine
+________________________________________
+1️⃣8️⃣ Secure Product Deletion
+If product exists in:
+orders
+Challenge
+Prevent deletion.
+Expected:
+soft delete
+________________________________________
+1️⃣9️⃣ Seller Analytics Aggregation
+Build:
+GET /seller/dashboard
+Return:
+revenue
+orders
+top products
+Use:
+aggregation pipeline
+________________________________________
+2️⃣0️⃣ Admin Fraud Detection
+Detect:
+20 orders in 1 minute
+Possible fraud.
+Challenge
+Add system to flag suspicious users.
+________________________________________
+Senior Backend Challenge
+Implement one API covering many tricky cases:
+POST /checkout
+Must handle:
+transactions
+inventory
+order creation
+cart validation
+price validation
+idempotency
+________________________________________
+If You Solve These
+You will practice:
+security
+race conditions
+transactions
+data integrity
+scalability
+performance
+These are exactly the hard problems backend engineers solve in production.
+	
+
+*/
+

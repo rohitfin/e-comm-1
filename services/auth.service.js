@@ -177,3 +177,24 @@ exports.refreshToken = async (req) => {
     throw new ApiError(401, "Authentication failed");
   }
 };
+
+exports.logoutAll = async (req) => {
+  const user = req.user;
+
+  const result = await LoginSession.updateMany(
+    { isActive: true, _id: { $ne: user.sessionId } },
+    {
+      $set: {
+        isActive: false,
+        refreshToken: null,
+        logoutTime: new Date(),
+      },
+    },
+  );
+
+  if (result.modifiedCount === 0) {
+    throw new ApiError(404, "No active sessions found");
+  }
+
+  return { count: result.modifiedCount };
+};

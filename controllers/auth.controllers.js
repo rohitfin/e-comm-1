@@ -22,10 +22,19 @@ const login = asyncHandler(async (req, res) => {
 const logout = asyncHandler(async (req, res) => {
   const sessionId = req.user.sessionId;
 
-  await LoginSession.findByIdAndUpdate(sessionId, {
-    isActive: false,
-    logoutTime: new Date(),
-  });
+  await LoginSession.findByIdAndUpdate(
+    { _id: sessionId, isActive: true },
+    {
+      isActive: false,
+      logoutTime: new Date(),
+      refreshToken: null, // IMPORTANT
+    },
+    { new: true }, // it returns UPDATED document
+  );
+
+  if (!session) {
+    throw new ApiError(401, "Session already expired");
+  }
 
   res.status(200).json({
     success: true,
@@ -43,4 +52,15 @@ const refreshToken = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { login, logout, refreshToken };
+const logoutAll = asyncHandler(async (req, res) => {
+
+  const data = await authService.logoutAll(req);
+
+  res.status(200).json({
+    success: true,
+    message: "Logout from all devices",
+    data
+  });
+});
+
+module.exports = { login, logout, refreshToken, logoutAll };
