@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 const LoginSession = require("../models/loginSession.model");
 const ApiError = require("../utils/apiError");
+const crypto = require("crypto");
 
 exports.login = async (email, password, req) => {
   const user = await User.findOne({ email })
@@ -24,8 +25,15 @@ exports.login = async (email, password, req) => {
     isActive: true,
   }).sort({ createdAt: 1 }); // oldest first
 
-  if (sessions.length >= 2) {
+  if (sessions.length > 0) {
     // remove oldest
+    // const oldestSession = sessions[0];
+    // await LoginSession.findByIdAndUpdate(oldestSession._id, {
+    //   isActive: false,
+    //   refreshToken: null,
+    // });
+
+    // remove all
     await LoginSession.updateMany(
       { userId: user._id, isActive: true },
       {
@@ -49,7 +57,7 @@ exports.login = async (email, password, req) => {
       role: user.roleId.name,
     },
     process.env.JWT_SECRET,
-    { expiresIn: refreshExpiryDate },
+    { expiresIn: process.env.refreshTokenExpiry },
   );
 
   // Create session
@@ -71,7 +79,7 @@ exports.login = async (email, password, req) => {
       sessionId: session._id,
     },
     process.env.JWT_SECRET,
-    { expiresIn: accessExpiryDate },
+    { expiresIn: process.env.accessTokenExpiry },
   );
 
   return {
@@ -87,15 +95,85 @@ exports.login = async (email, password, req) => {
   };
 };
 
-exports.refreshToken = async (req, sessionId) => {
-  const session = await LoginSession.findById({ sessionId: sessionid, isActive: true });
+exports.refreshToken = async (req) => {
+  const authHeader = req.headers.authorization;
 
-  if(!session){
-    return {
-      message: 'Session is expired'
-    }
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    throw new ApiError(401, "Token missing");
   }
 
-  
+  const token = authHeader.split(" ")[1];
 
+  try {
+    const session = await LoginSession.findOne({
+      refreshToken: token,
+      isActive: true,
+    });
+
+    if (!session) {
+      throw new ApiError(401, "Session is expired");
+    }
+
+    if (session.refreshTokenExpiryAt < new Date()) {
+      session.isActive = false;
+      await session.save();
+      throw new ApiError(401, "Refresh token expired");
+    }
+
+    // user
+    const user = await User.findById(session.userId).populate("roleId", "name");
+
+    if (!user) {
+      throw new ApiError(401, "User not found");
+    }
+
+    const accessExpiryMs = 15 * 60 * 1000;
+    const accessExpiryDate = new Date(Date.now() + accessExpiryMs);
+
+    // Rotate refresh token
+    const newRefreshToken = crypto.randomBytes(40).toString("hex");
+
+    session.refreshToken = newRefreshToken;
+    session.refreshTokenExpiryAt = new Date(
+      Date.now() + 7 * 24 * 60 * 60 * 1000,
+    );
+    session.accessTokenExpiryAt = accessExpiryDate;
+    session.lastActivity = new Date();
+
+    await session.save();
+
+    // new access token
+    const accessToken = jwt.sign(
+      {
+        _id: user._id,
+        roleId: user.roleId._id,
+        role: user.roleId.name,
+        sessionId: session._id,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.accessTokenExpiry },
+    );
+
+    return {
+      accessToken,
+      refreshToken: newRefreshToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        roleId: user.roleId._id,
+        role: user.roleId.name,
+      },
+    };
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      throw new ApiError(401, "Token expired");
+    }
+
+    if (error.name === "JsonWebTokenError") {
+      throw new ApiError(401, "Invalid token");
+    }
+
+    throw new ApiError(401, "Authentication failed");
+  }
 };

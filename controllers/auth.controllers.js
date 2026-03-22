@@ -34,8 +34,7 @@ const logout = asyncHandler(async (req, res) => {
 });
 
 const refreshToken = asyncHandler(async (req, res) => {
-  const sessionId = req.user.sessionId;
-  const data = await authService.refreshToken(req, sessionId);
+  const data = await authService.refreshToken(req);
 
   res.status(200).json({
     success: true,
