@@ -6,16 +6,13 @@ const userService = require("../services/user.service");
 const ApiError = require("../utils/apiError");
 
 const getUsers = asyncHandler(async (req, res) => {
-  const users = await UserModel.find({}).lean();
-
-  if (!users || users.length === 0) {
-    throw new ApiError(404, "No users found");
-  }
+  const users = await userService.getUsers(req.query);
 
   res.status(200).json({
     success: true,
     message: "User fetch successful",
-    data: users,
+    data: users.data,
+    pagination: users.pagination,
   });
 });
 

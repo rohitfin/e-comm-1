@@ -6,7 +6,7 @@ const { authorize } = require("../middlewares/role.middleware");
 
 router.post("/login", login);
 router.post("/logout", authProtect, logout);
-router.get("/refresh-token", refreshToken);
+router.post("/refresh-token", refreshToken);
 router.post("/logout-all", authProtect, authorize("admin"), logoutAll);
 
 module.exports = router;

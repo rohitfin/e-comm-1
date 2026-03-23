@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const ApiError = require("../utils/apiError");
 const LoginSession = require("../models/loginSession.model");
+const User = require("../models/user.model");
 
 exports.authProtect = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -21,6 +22,16 @@ exports.authProtect = async (req, res, next) => {
 
     if (!session) {
       throw new ApiError(401, "Session expired");
+    }
+
+    const user = await User.findById({_id: session.userId});
+
+    if(!user){
+      throw new ApiError(401, "User not found!");
+    }
+
+    if(!user.isActive){
+      throw new ApiError(401, "User is inactive")
     }
 
     req.session = session;

@@ -14,11 +14,12 @@ const { createUserSchema } = require("../validators/user.validator");
 const { authProtect } = require("../middlewares/auth.middleware");
 const { authorize } = require("../middlewares/role.middleware");
 
-router.get("/", authProtect, authorize("admin"), getUsers);
+router.get("/", authProtect, authorize("admin"), getUsers); // /users?role=admin,seller&isActive=true&search=rohit
 router.get("/:id", validateId, getUserById);
 router.post(
   "/",
   authProtect,
+  authorize("admin"),
   validateMiddleware(createUserSchema),
   createUser,
 );

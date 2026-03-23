@@ -259,16 +259,16 @@ ________________________________________
       •	set isActive=false - ✅
 ________________________________________
 4️⃣ Logout All Devices
-  POST /auth/logout-all
+  POST /auth/logout-all - ✅
   Invalidate all sessions of the user.
   ________________________________________
 5️⃣ Middleware
   Build middleware:
   authProtect
   Must validate:
-    •	JWT
-    •	session active
-    •	user active
+    •	JWT - ✅
+    •	session active - ✅
+    •	user active - ✅
 ________________________________________
 6️⃣ Role Based Authorization
     Create middleware:
@@ -277,7 +277,7 @@ ________________________________________
     authorize("customer")
     Example:
     DELETE /users/:id
-    Admin only
+    Admin only - ✅
 ________________________________________
 SECTION 2 — User Management
 7️⃣ Admin Create User
@@ -285,23 +285,23 @@ SECTION 2 — User Management
     •	seller
     •	customer
     Validation:
-    •	unique email
-    •	roleId must exist
+    •	unique email - ✅
+    •	roleId must exist - ✅
 ________________________________________
 8️⃣ Get Users with Filters
     GET /users
     Support:
-    •	pagination
-    •	role filter
-    •	search by email/name
-    •	active users
+    •	pagination - ✅
+    •	role filter and multiple role - ✅
+    •	search by email/name - ✅
+    •	active users - ✅
     Example:
-    /users?page=1&limit=10&role=seller&search=rohit
+    /users?page=1&limit=10&role=seller,admin&search=rohit
 ________________________________________
 9️⃣ Soft Delete User
     Instead of deleting:
-    isDeleted = true
-    User cannot login anymore.
+    isDeleted = true - ✅
+    User cannot login anymore. - ✅
 ________________________________________
 SECTION 3 — Product APIs
 🔟 Seller Create Product
