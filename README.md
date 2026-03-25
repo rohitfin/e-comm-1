@@ -315,12 +315,20 @@ ________________________________________
     GET /products
     Filters:
     •	category - ✅
-    •	price range
+    •	price range - ✅
     •	seller - ✅
     •	pagination - ✅
     •	sorting
     Example:
     /products?category=electronics&minPrice=500&maxPrice=50000
+
+    Future
+    Aggregation-based filtering (Amazon style)
+    OR caching + performance (Redis)
+    Search engine (ElasticSearch vs MongoDB)
+
+    👉 Real difference between "text" vs normal index vs regex performance
+    👉 OR how Mongo splits words internally (very interesting)
 ________________________________________
 12️⃣ Product Detail API
     GET /products/:id

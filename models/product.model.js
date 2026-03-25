@@ -30,8 +30,38 @@ const productSchema = new mongoose.Schema(
 // Indexes
 productSchema.index({ sellerId: 1 });
 productSchema.index({ categoryId: 1 });
-productSchema.index({ isDeleted: 1, isActive: 1 });
-productSchema.index({ name: 1, sellerId: 1 }, { unique: true });
+// productSchema.index({ isDeleted: 1, isActive: 1 });
+
+// Optimized query index
+productSchema.index({
+  isDeleted: 1,
+  isActive: 1,
+  categoryId: 1,
+});
+
+// price filter
+productSchema.index({ price: 1 });
+
+// price + category
+productSchema.index({ categoryId: 1, price: 1 });
+
+// Search (weighted)
+productSchema.index(
+  { name: "text", description: "text" }, // "text" is a special keyword in MongoDB
+  { weights: { name: 5, description: 1 } } // more important -> Product name match → more important, Description match → less important
+);
+
+// productSchema.index({ name: 1, sellerId: 1 }, { unique: true });
+
+// Unique product per seller (case-insensitive + soft delete safe)
+productSchema.index(
+  { name: 1, sellerId: 1 }, // sellerId + name  => Unique combination
+  {
+    unique: true, //1 seller cannot create duplicate product names
+    collation: { locale: "en", strength: 2 }, //Case insensitive
+    partialFilterExpression: { isDeleted: false }, //Deleted products ignored
+  },
+);
 
 const product = mongoose.model("tbl_products", productSchema);
 module.exports = product;

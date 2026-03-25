@@ -7,57 +7,72 @@ exports.getProduct = async (query) => {
   const limit = parseInt(query.limit) || 10;
   const skip = (page - 1) * limit;
 
-  const filter = {};
+  const filter = {
+    // isDeleted: false,
+  };
 
   if (query.isActive !== undefined) {
     filter.isActive = query.isActive === "true";
   }
 
   if (query.category) {
-    const category = await Category.findOne({ name: { $regex: query.category, $option: "i" } });
+    const category = await Category.findOne({
+      name: { $regex: query.category, $options: "i" },
+    }).lean();
 
-    if (category) {
-      filter.category = category._id;
-    } else {
+    if (!category) {
       return {
         data: [],
-        pagination: {
-          total: 0,
-          page,
-          limit,
-          totalPage: 0,
-        },
+        pagination: { total: 0, page, limit, totalPage: 0 },
       };
+    }
+
+    filter.categoryId = category._id;
+  }
+
+  let sort = { createdAt: -1 }; //Latest first
+
+  if (query.search) {
+    filter.$text = { $search: query.search };
+
+    if (query.sort === "price_asc") {
+      sort = { price: 1 };
+    } else if (query.sort === "price_desc") {
+      sort = { price: -1 };
+    } else {
+      sort = { score: { $meta: "textScore" } }; // Best match first - MongoDB gives each result a score
     }
   }
 
-  if (query.search) {
-    filter.$or = [{ name: { $regex: query.search, $option: "i" } }];
+  if (query.minPrice || query.maxPrice) {
+    filter.price = {};
+    if (query.minPrice) filter.price.$gte = Number(query.minPrice);
+    if (query.maxPrice) filter.price.$lte = Number(query.maxPrice);
   }
 
-  const products = await Product.find(filter).skip(skip).limit(limit).lean();
-
-  if (!products) {
-    return {
-      data: [],
-      pagination: {
-        total: 0,
-        page,
-        limit,
-        totalPage: 0,
-      },
-    };
-  }
+  const products = await Product.find(filter)
+    .select(query.search ? { score: { $meta: "textScore" } } : {}) // Score available - Mongo needs score in projection to sort properly -> $text → generates score .select() → exposes that score
+    .sort(sort)
+    .skip(skip)
+    .limit(limit)
+    .populate("categoryId", "name")
+    .populate("sellerId", "name email")
+    .lean();
 
   const total = await Product.countDocuments(filter);
 
+  const formattedProducts = products.map((p) => ({
+    ...p,
+    category: p.categoryId?.name || null,
+  }));
+
   return {
-    data: products,
+    products: formattedProducts,
     pagination: {
-      total: total,
+      total,
       page,
       limit,
-      totalPage: Match.ceil(total / limit),
+      totalPage: Math.ceil(total / limit),
     },
   };
 };

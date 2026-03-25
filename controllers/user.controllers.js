@@ -11,8 +11,8 @@ const getUsers = asyncHandler(async (req, res) => {
   res.status(200).json({
     success: true,
     message: "User fetch successful",
-    data: users.data,
     pagination: users.pagination,
+    data: users.data,
   });
 });
 

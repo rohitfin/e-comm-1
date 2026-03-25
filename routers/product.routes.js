@@ -13,7 +13,7 @@ router.get(
   getProducts,
 );
 
-router.post(
+router.post( //?search=lenovo&category=electronics&minPrice=500&maxPrice=50000&isActive=true&page=1&limit=10&sort=price_asc
   "/",
   authProtect,
   authorize("admin", "seller"),
