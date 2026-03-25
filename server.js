@@ -6,6 +6,7 @@ const ApiError = require("./utils/apiError");
 const userRoutes = require("./routers/user.router");
 const roleRoutes = require("./routers/role.router");
 const authRoutes = require("./routers/auth.router");
+const productRoutes = require("./routers/product.routes");
 
 const app = express();
 
@@ -31,6 +32,7 @@ const port = process.env.PORT || 3000;
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/role", roleRoutes);
+app.use("/api/product", productRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

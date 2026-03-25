@@ -307,17 +307,17 @@ SECTION 3 — Product APIs
 🔟 Seller Create Product
     POST /products
     Rules:
-    •	seller can only create products for themselves
-    •	validate category
-    •	price > 0
+    •	seller can only create products for themselves - ✅
+    •	validate category - ✅
+    •	price > 0 - ✅
 ________________________________________
 11️⃣ Product Listing API
     GET /products
     Filters:
-    •	category
+    •	category - ✅
     •	price range
-    •	seller
-    •	pagination
+    •	seller - ✅
+    •	pagination - ✅
     •	sorting
     Example:
     /products?category=electronics&minPrice=500&maxPrice=50000
