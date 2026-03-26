@@ -215,6 +215,9 @@ curl -X POST http://localhost:3000/api/user/ \
 ---
 
 /*
+-- sanitizeUser 
+-- hide sensitive data like password, OTP, token
+
 SECTION 1 — Authentication & Security
 1️⃣ Login API
   Build a login API.
@@ -323,7 +326,7 @@ ________________________________________
     /products?category=electronics&minPrice=500&maxPrice=50000
 
     Future
-    Aggregation-based filtering (Amazon style)
+    Aggregation-based filtering - ✅
     OR caching + performance (Redis)
     Search engine (ElasticSearch vs MongoDB)
 
@@ -333,10 +336,10 @@ ________________________________________
 12️⃣ Product Detail API
     GET /products/:id
     Return:
-    •	product
-    •	category
-    •	seller
-    •	inventory
+    •	product - ✅
+    •	category - ✅
+    •	seller - ✅
+    •	inventory - ✅
 ________________________________________
 13️⃣ Update Product
     Only seller who created it can update.
