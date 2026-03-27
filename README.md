@@ -345,7 +345,7 @@ ________________________________________
     Only seller who created it can update.
 ________________________________________
 14️⃣ Delete Product
-    Soft delete product.
+    Soft delete product. - ✅
 ________________________________________
 SECTION 4 — Inventory
     15️⃣ Inventory API

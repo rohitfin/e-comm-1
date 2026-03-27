@@ -299,7 +299,7 @@ exports.getProductsDetail = async (req) => {
         as: "inventory",
       },
     },
-    
+
     {
       $addFields: {
         user: "$user.name", //You are replacing full user object with just user.name
@@ -314,8 +314,6 @@ exports.getProductsDetail = async (req) => {
         category: 0,
       },
     },
-
-
   ]);
 
   if (!result.length) {
@@ -323,4 +321,69 @@ exports.getProductsDetail = async (req) => {
   }
 
   return result[0];
+};
+
+exports.updateProduct = async (req) => {
+  const user = req.user;
+  const productId = req.params.id;
+  const body = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    throw new ApiError(400, "Invalid product ID");
+  }
+
+  const product = await Product.findOne({
+    _id: productId,
+    // isDeleted: false,
+  });
+
+  if (!product) {
+    throw new ApiError(404, "Product not found");
+  }
+
+  if (
+    user.role !== "admin" &&
+    product.sellerId.toString() !== user._id.toString()
+  ) {
+    throw new ApiError(403, "Not allowed to update this product");
+  }
+
+  const allowedFields = ["name", "price", "categoryId", "description"];
+  const updateData = {};
+
+  allowedFields.forEach((field) => {
+    if (body[field] !== undefined) {
+      updateData[field] = body[field];
+    }
+  });
+
+  if (Object.keys(updateData).length === 0) {
+    throw new ApiError(400, "No valid fields to update");
+  }
+
+  const updatedProduct = await Product.findByIdAndUpdate(
+    productId,
+    { $set: updateData },
+    { new: true, runValidators: true },
+  );
+
+  return updatedProduct;
+};
+
+exports.deleteProduct = async (req) => {
+  const productId = req.params.id;
+
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    throw ApiError(400, "Invalid product ID");
+  }
+
+  const product = await Product.findByIdAndUpdate(productId, {
+    isDeleted: true,
+  });
+
+  if (!product) {
+    throw ApiError(404, "Product not found or already deleted");
+  }
+
+  return true;
 };

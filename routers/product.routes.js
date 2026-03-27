@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { getProducts, getProductSearch, createProduct, getProductsDetail } = require("../controllers/product.controller");
-const { createProductSchema } = require("../validators/product.validator");
+const { getProducts, getProductSearch, createProduct, getProductsDetail, deleteProduct, updateProduct } = require("../controllers/product.controller");
+const { createProductSchema, idParamSchema, updateProductSchema } = require("../validators/product.validator");
 const { authProtect } = require("../middlewares/auth.middleware");
 const { authorize } = require("../middlewares/role.middleware");
 const validateMiddleware = require("../middlewares/validate.middleware");
@@ -27,13 +27,28 @@ router.get(
   getProductsDetail,
 );
 
-
 router.post(
   "/",
   authProtect,
   authorize("admin", "seller"),
   validateMiddleware(createProductSchema),
   createProduct,
+);
+
+router.put(
+  "/:id",
+  authProtect,
+  authorize("admin", "seller"),
+  validateMiddleware(idParamSchema, "params"),
+  validateMiddleware(updateProductSchema, "body"),
+  updateProduct
+);
+
+router.delete(
+  "/:id",
+  authProtect,
+  authorize("admin", "seller"),
+  deleteProduct,
 );
 
 

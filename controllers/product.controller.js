@@ -32,20 +32,41 @@ const createProduct = async (req, res) => {
   });
 };
 
-const getProductsDetail = async(req, res)=>{
-
+const getProductsDetail = async (req, res) => {
   const data = await productService.getProductsDetail(req);
 
   return res.status(200).json({
     success: true,
     message: "Product detail fetch successfully",
-    data
-  })
-}
+    data,
+  });
+};
+
+const updateProduct = async (req, res) => {
+  const data = await productService.updateProduct(req);
+
+  return res.status(200).json({
+    success: true,
+    message: "Product updated successfully",
+    data,
+  });
+};
+
+const deleteProduct = async (req, res) => {
+  const data = await productService.deleteProduct(req);
+
+  return res.status(200).json({
+    success: true,
+    message: "Product deleted successfully",
+    data,
+  });
+};
 
 module.exports = {
   getProducts,
   getProductSearch,
   createProduct,
-  getProductsDetail
+  getProductsDetail,
+  deleteProduct,
+  updateProduct,
 };
