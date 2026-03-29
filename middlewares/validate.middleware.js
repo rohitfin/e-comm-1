@@ -25,6 +25,8 @@ const validateMiddleware = (schema, property = "body") => {
       abortEarly: false,
       stripUnknown: true, 
     });
+    // stripUnknown: true, // remove extra fields
+    // allowUnknown: true, // Allow Unknown Fields (Not Recommended)
 
     if (error) {
       return next(new ApiError(400, error.details[0].message));

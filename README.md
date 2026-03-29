@@ -342,14 +342,14 @@ ________________________________________
     •	inventory - ✅
 ________________________________________
 13️⃣ Update Product
-    Only seller who created it can update.
+    Only seller who created it can update. - ✅
 ________________________________________
 14️⃣ Delete Product
     Soft delete product. - ✅
 ________________________________________
 SECTION 4 — Inventory
     15️⃣ Inventory API
-    GET /inventory/:productId
+    GET /inventory/:productId  - ✅
     Return stock.
 ________________________________________
 16️⃣ Update Inventory
