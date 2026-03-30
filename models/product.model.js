@@ -63,5 +63,5 @@ productSchema.index(
   },
 );
 
-const product = mongoose.model("tbl_products", productSchema);
+const product = mongoose.model("Product", productSchema, "tbl_products");
 module.exports = product;

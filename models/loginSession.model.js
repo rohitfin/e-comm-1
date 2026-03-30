@@ -35,4 +35,4 @@ const loginSessionSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("tbl_login_sessions", loginSessionSchema);
+module.exports = mongoose.model("LoginSession", loginSessionSchema, "tbl_login_sessions");

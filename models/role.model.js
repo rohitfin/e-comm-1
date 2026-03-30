@@ -13,4 +13,4 @@ const roleSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-module.exports = mongoose.model("tbl_roles", roleSchema);
+module.exports = mongoose.model("Role", roleSchema, "tbl_roles");

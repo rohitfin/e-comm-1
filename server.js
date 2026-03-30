@@ -17,12 +17,21 @@ app.set("trust proxy", true); // app.set('trust proxy', 1);
 const cors = require("cors"); // allow cross origin user can access api
 const helmet = require("helmet"); // setting various HTTP security headers
 const morgan = require("morgan"); // logs HTTP requests in the console.
+const rateLimit = require("express-rate-limit");
 
 // middle ware
 app.use(express.json());
 app.use(helmet());
 app.use(cors());
 app.use(morgan("dev"));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later.",
+});
+app.use(limiter);
 
 // DB connection
 connectDB();
@@ -35,6 +44,11 @@ app.use("/api/user", userRoutes);
 app.use("/api/role", roleRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/inventory", inventoryRoutes);
+
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
+});
 
 // 404 handler
 app.use((req, res, next) => {
@@ -55,3 +69,6 @@ app.use(errorHandler);
 app.listen(port, () => {
   console.log(`🚀 Server Running on http://localhost:${port}`);
 });
+
+// Export app for testing
+module.exports = app;

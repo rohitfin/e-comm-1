@@ -1,3 +1,9 @@
+# E-Commerce Backend API
+
+A Node.js backend for an e-commerce platform with authentication, user management, product inventory, and role-based access control.
+
+**📋 Project Guidelines**: See [PROJECT_GUIDELINES.md](PROJECT_GUIDELINES.md) for best practices, code quality standards, and development guidelines.
+
 ## 🔐 Authentication & Authorization
 
 ### Login Flow
