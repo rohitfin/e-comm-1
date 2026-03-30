@@ -6,7 +6,7 @@ const inventorySchema = new mongoose.Schema(
     productId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "tbl_products"
+      ref: "Product"
     },
     stock: { type: Number, default: 0, min: 0, required: true },
   },

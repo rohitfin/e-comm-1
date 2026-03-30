@@ -17,15 +17,15 @@ const userSchema = new mongoose.Schema(
 
     roleId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "tbl_roles",
+      ref: "Role",
       required: true,
     },
 
     isActive: { type: Boolean, default: true },
     isDeleted: { type: Boolean, default: false },
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "tbl_users" },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Role" },
     createdIP: { type: String, default: null },
-    modifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: "tbl_users" },
+    modifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     modifiedIP: { type: String, default: null },
   },
   { timestamps: true },

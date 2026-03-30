@@ -223,6 +223,15 @@ curl -X POST http://localhost:3000/api/user/ \
 /*
 -- sanitizeUser 
 -- hide sensitive data like password, OTP, token
+-- error log : Winston, Pino
+-- req.id = uuid() and res.setHeader("X-Request-Id", req.id);
+
+
+
+
+
+
+
 
 SECTION 1 — Authentication & Security
 1️⃣ Login API
@@ -362,7 +371,7 @@ ________________________________________
     PATCH /inventory/:productId
     Seller can update stock.
     Edge cases:
-    •	stock cannot be negative
+    •	stock cannot be negative - ✅
 ________________________________________
 17️⃣ Low Stock Alert API
     Return products where:

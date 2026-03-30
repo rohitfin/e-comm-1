@@ -1,8 +1,8 @@
-const RoleModel = require("../models/role.model");
+const Role = require("../models/role.model");
 const ApiError = require("../utils/apiError");
 
 exports.getRoles = async () => {
-  return await RoleModel.select("-__v").lean();
+  return await Role.select("-__v").lean();
 };
 
 exports.addRole = async (payload) => {
@@ -12,7 +12,7 @@ exports.addRole = async (payload) => {
     throw new ApiError(400, "Role name is required");
   }
 
-  const existingRole = await RoleModel.findOne({
+  const existingRole = await Role.findOne({
     name: name.trim().toLowerCase(),
   });
 
@@ -20,7 +20,7 @@ exports.addRole = async (payload) => {
     throw new ApiError(409, "Role already exists");
   }
 
-  const role = await RoleModel.create({
+  const role = await Role.create({
     name: name.trim().toLowerCase(),
   });
 
@@ -28,7 +28,7 @@ exports.addRole = async (payload) => {
 };
 
 exports.updateRole = async (id, name) => {
-  const role = await RoleModel.findById(id);
+  const role = await Role.findById(id);
 
   if (!role) {
     throw new ApiError(404, "Role not found");
@@ -43,7 +43,7 @@ exports.updateRole = async (id, name) => {
 };
 
 exports.deleteRole = async(id)=>{
-  const role = await RoleModel.findByIdAndDelete(id);
+  const role = await Role.findByIdAndDelete(id);
 
   if (!role) {
     throw new ApiError(404, "Role not found");

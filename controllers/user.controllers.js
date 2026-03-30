@@ -1,6 +1,6 @@
 // const { default: mongoose } = require("mongoose");
 const mongoose = require("mongoose");
-const UserModel = require("../models/user.model");
+const User = require("../models/user.model");
 const asyncHandler = require("../middlewares/asyncHandler");
 const userService = require("../services/user.service");
 const ApiError = require("../utils/apiError");
@@ -23,7 +23,7 @@ const getUserById = asyncHandler(async (req, res) => {
     throw new ApiError(400, "User id is incorrect");
   }
 
-  const result = await UserModel.findById(id).lean();
+  const result = await User.findById(id).lean();
 
   if (!result) {
     throw new ApiError(404, "User not found");

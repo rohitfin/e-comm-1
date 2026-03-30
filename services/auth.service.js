@@ -96,15 +96,15 @@ exports.login = async (email, password, req) => {
 };
 
 exports.refreshToken = async (req) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw new ApiError(401, "Token missing");
-  }
-
-  const token = authHeader.split(" ")[1];
-
   try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      throw new ApiError(401, "Token missing");
+    }
+
+    const token = authHeader.split(" ")[1];
+
     const session = await LoginSession.findOne({
       refreshToken: token,
       isActive: true,
@@ -166,15 +166,17 @@ exports.refreshToken = async (req) => {
       },
     };
   } catch (error) {
-    if (error.name === "TokenExpiredError") {
-      throw new ApiError(401, "Token expired");
-    }
+    // if (error.name === "TokenExpiredError") {
+    //   throw new ApiError(401, "Token expired");
+    // }
 
-    if (error.name === "JsonWebTokenError") {
-      throw new ApiError(401, "Invalid token");
-    }
+    // if (error.name === "JsonWebTokenError") {
+    //   throw new ApiError(401, "Invalid token");
+    // }
 
-    throw new ApiError(401, "Authentication failed");
+    // throw new ApiError(401, "Authentication failed");
+
+    throw error
   }
 };
 

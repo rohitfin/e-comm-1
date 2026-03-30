@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const loginSessionSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "tbl_users",
+    ref: "User",
     required: true
   },
   ipAddress: String,

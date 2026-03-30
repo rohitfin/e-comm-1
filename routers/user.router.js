@@ -13,18 +13,25 @@ const validateMiddleware = require("../middlewares/validate.middleware");
 const { createUserSchema } = require("../validators/user.validator");
 const { authProtect } = require("../middlewares/auth.middleware");
 const { authorize } = require("../middlewares/role.middleware");
+const asyncHandler = require("../middlewares/asyncHandler");
 
-router.get("/", authProtect, authorize("admin"), getUsers); // /users?role=admin,seller&isActive=true&search=rohit
+router.get("/", asyncHandler(authProtect), authorize("admin"), getUsers); // /users?role=admin,seller&isActive=true&search=rohit
 router.get("/:id", validateId, getUserById);
 router.post(
   "/",
-  authProtect,
+  asyncHandler(authProtect),
   authorize("admin"),
   validateMiddleware(createUserSchema),
   createUser,
 );
 router.put("/update-password/:id", validateId, updatePassword);
 router.get("/detail/:id", validateId, getUserDetail);
-router.delete("/:id", authProtect, authorize("admin"), validateId, deleteUser);
+router.delete(
+  "/:id",
+  asyncHandler(authProtect),
+  authorize("admin"),
+  validateId,
+  deleteUser,
+);
 
 module.exports = router;

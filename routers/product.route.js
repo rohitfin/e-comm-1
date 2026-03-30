@@ -5,31 +5,32 @@ const { createProductSchema, idParamSchema, updateProductSchema } = require("../
 const { authProtect } = require("../middlewares/auth.middleware");
 const { authorize } = require("../middlewares/role.middleware");
 const validateMiddleware = require("../middlewares/validate.middleware");
+const asyncHandler = require("../middlewares/asyncHandler");
 
 router.get( //?search=lenovo&category=electronics&minPrice=500&maxPrice=50000&isActive=true&page=1&limit=10&sort=price_asc
   "/",
-  authProtect,
+  asyncHandler(authProtect),
   authorize("admin", "seller"),
   getProducts,
 );
 
 router.get( //?search=lenovo&category=electronics&minPrice=500&maxPrice=50000&isActive=true&page=1&limit=10&sort=price_asc
   "/search",
-  authProtect,
+  asyncHandler(authProtect),
   authorize("admin", "seller"),
   getProductSearch,
 );
 
 router.get(
   "/:id",
-  authProtect,
+  asyncHandler(authProtect),
   authorize("admin", "seller"),
   getProductsDetail,
 );
 
 router.post(
   "/",
-  authProtect,
+  asyncHandler(authProtect),
   authorize("admin", "seller"),
   validateMiddleware(createProductSchema),
   createProduct,
@@ -37,7 +38,7 @@ router.post(
 
 router.put(
   "/:id",
-  authProtect,
+  asyncHandler(authProtect),
   authorize("admin", "seller"),
   validateMiddleware(idParamSchema, "params"),
   validateMiddleware(updateProductSchema, "body"),
@@ -46,7 +47,7 @@ router.put(
 
 router.delete(
   "/:id",
-  authProtect,
+  asyncHandler(authProtect),
   authorize("admin", "seller"),
   deleteProduct,
 );

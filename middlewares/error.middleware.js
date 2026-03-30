@@ -1,37 +1,67 @@
 const errorHandler = (err, req, res, next) => {
+  // Default values
   let status = err.statusCode || 500;
-  const isDevelopment = process.env.NODE_ENV === "development";
+  const isDevelopment = process.env.NODE_ENV !== "production";
 
-  // Normalize message
-  let message =
-    status === 500 && !isDevelopment
-      ? "Internal Server Error"
-      : err.message;
+  // Safe default message
+  let message = err.message || "Internal Server Error";
 
-  // Handle known errors
+  // Mongoose Validation Error
   if (err.name === "ValidationError") {
     status = 400;
-    message = "Validation Error";
+    message = Object.values(err.errors)
+      .map((e) => e.message)
+      .join(", ");
   }
 
+  // Mongo Duplicate Key Error
   if (err.code === 11000) {
     status = 400;
-    message = "Duplicate field value";
+    const field = Object.keys(err.keyValue || {})[0];
+    message = field
+      ? `${field} already exists`
+      : "Duplicate field value";
   }
 
-  // Log error with request info
-  console.error(
-    `[${new Date().toISOString()}] ${req.method} ${req.originalUrl} - ${status} - ${err.message}`
-  );
-
-  if (isDevelopment) {
-    console.error(err.stack);
+  // Mongoose CastError (invalid ObjectId)
+  if (err.name === "CastError") {
+    status = 400;
+    message = `Invalid ${err.path}`;
   }
 
+  // JWT Errors (from jsonwebtoken)
+  if (err.name === "JsonWebTokenError") {
+    status = 401;
+    message = "Authentication failed";
+  }
+
+  if (err.name === "TokenExpiredError") {
+    status = 401;
+    message = "Token expired";
+  }
+
+  // Hide internal errors in production
+  if (!isDevelopment && status === 500) {
+    message = "Something went wrong";
+  }
+
+  // Logging (ALWAYS log)
+  console.error("🔥 ERROR LOG");
+  console.error({
+    time: new Date().toISOString(),
+    method: req.method,
+    url: req.originalUrl,
+    status,
+    name: err.name,
+    message: err.message, // original message
+    stack: err.stack,
+  });
+
+  // Response to client
   res.status(status).json({
     success: false,
-    message,
-    error: err.name || "Error",
+    message, // safe message
+    error: isDevelopment ? err.name : "Error",
     ...(isDevelopment && { stack: err.stack }), // if (isDevelopment) { response.stack = err.stack; }
   });
 };
