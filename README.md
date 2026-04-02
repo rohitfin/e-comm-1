@@ -375,7 +375,7 @@ ________________________________________
 ________________________________________
 17️⃣ Low Stock Alert API
     Return products where:
-    stock < 10
+    stock < 10 - ✅
 ________________________________________
 SECTION 5 — Cart System
 18️⃣ Add to Cart

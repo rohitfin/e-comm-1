@@ -8,6 +8,7 @@ const roleRoutes = require("./routers/role.router");
 const authRoutes = require("./routers/auth.router");
 const productRoutes = require("./routers/product.route");
 const inventoryRoutes = require("./routers/inventory.router");
+const cartRoutes = require("./routers/cart.router");
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/role", roleRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/inventory", inventoryRoutes);
+app.use("/api/cart", cartRoutes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
