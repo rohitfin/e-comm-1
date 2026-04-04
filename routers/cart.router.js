@@ -9,11 +9,13 @@ const {
 } = require("../controllers/cart.controller");
 const { authProtect } = require("../middlewares/auth.middleware");
 const asyncHandler = require("../middlewares/asyncHandler");
+const { authorize } = require("../middlewares/role.middleware");
 
 router.get("/", asyncHandler(authProtect), asyncHandler(getCart));
 router.post(
   "/",
   asyncHandler(authProtect),
+  authorize("admin", "customer"),
   asyncHandler(addCart),
 );
 router.put(

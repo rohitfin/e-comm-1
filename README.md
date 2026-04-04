@@ -381,12 +381,12 @@ SECTION 5 — Cart System
 18️⃣ Add to Cart
     POST /cart/add
     Rules:
-    •	user must be customer
-    •	check product exists
-    •	check stock available
+    •	user must be customer - ✅
+    •	check product exists - ✅
+    •	check stock available - ✅
 ________________________________________
 19️⃣ Update Cart Item
-    PATCH /cart/item/:id
+    PATCH /cart/item/:id - ✅
     Update quantity.
 ________________________________________
 20️⃣ Remove Cart Item
