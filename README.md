@@ -390,9 +390,9 @@ ________________________________________
     Update quantity.
 ________________________________________
 20️⃣ Remove Cart Item
-    DELETE /cart/item/:id   
+    DELETE /cart/item/:id   - ✅
 ________________________________________
-21️⃣ Get Cart
+21️⃣ Get Cart - ✅
     GET /cart
     Return:
     •	product details
@@ -400,7 +400,7 @@ ________________________________________
     •	price
     •	subtotal
 ________________________________________
-22️⃣ Cart Total Calculation
+22️⃣ Cart Total  - ✅
     Return:
     subtotal
     tax

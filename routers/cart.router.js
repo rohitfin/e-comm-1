@@ -6,6 +6,8 @@ const {
   updateCartItem,
   removeCartItem,
   clearCart,
+  getCartTotal,
+  getAdminCartTotal
 } = require("../controllers/cart.controller");
 const { authProtect } = require("../middlewares/auth.middleware");
 const asyncHandler = require("../middlewares/asyncHandler");
@@ -29,5 +31,7 @@ router.delete(
   asyncHandler(removeCartItem),
 );
 router.delete("/", asyncHandler(authProtect), asyncHandler(clearCart));
+router.get("/cart-total", asyncHandler(authProtect), asyncHandler(getCartTotal))
+router.get("/cart-total-admin", asyncHandler(authProtect), asyncHandler(getAdminCartTotal))
 
 module.exports = router;

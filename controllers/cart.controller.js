@@ -62,4 +62,37 @@ const clearCart = async (req, res) => {
   });
 };
 
-module.exports = { getCart, addCart, updateCartItem, removeCartItem, clearCart };
+const getCartTotal = async (req, res) => { 
+  const user = req.user._id;
+
+  const data = await cartService.getCartTotal(user);
+
+  return res.status(200).json({
+    success: true,
+    message: "Cart Total",
+    data,
+  })
+
+};
+
+const getAdminCartTotal = async(req, res)=>{
+  
+  const data = await cartService.getAdminCartTotal();
+
+  return res.status(200).json({
+    success: true,
+    message: "All Cart Total",
+    data
+  })
+
+}
+
+module.exports = {
+  getCart,
+  addCart,
+  updateCartItem,
+  removeCartItem,
+  clearCart,
+  getCartTotal,
+  getAdminCartTotal
+};
