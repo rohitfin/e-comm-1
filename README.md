@@ -406,8 +406,8 @@ ________________________________________
     tax
     grandTotal
 ________________________________________
-SECTION 6 — Order System
-23️⃣ Place Order
+SECTION 6 — Order System 
+23️⃣ Place Order - ✅
     POST /orders
     Flow:
     cart → order
@@ -419,7 +419,7 @@ SECTION 6 — Order System
     5.	reduce stock
     6.	clear cart
 ________________________________________
-24️⃣ Get My Orders
+24️⃣ Get My Orders ✅
     GET /orders/my
     Customer only.
 ________________________________________

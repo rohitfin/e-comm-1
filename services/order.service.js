@@ -1,51 +1,148 @@
-const Order = require("../models/order.model");
 const ApiError = require("../utils/apiError");
 const mongoose = require("mongoose");
+const Cart = require("../models/cart.model");
 const CartItem = require("../models/cartItem.model");
 const User = require("../models/user.model");
 const Address = require("../models/address.model");
+const Inventory = require("../models/inventory.model");
+const Order = require("../models/order.model");
+const OrderItem = require("../models/orderItems.model");
 
 exports.getOrder = async (userId) => {
   const data = await Order.find({ userId }).lean();
   return data;
 };
 
-/*
-Steps:
-1.	validate cart
-2.	check inventory
-3.	create order
-4.	create order_items
-5.	reduce stock
-6.	clear cart
-*/
-exports.createOrder = async (payload) => {
-  const userId = payload.user?._id;
+exports.createOrder = async (req) => {
+  const userId = req.user?._id;
+  const { cartItemIds, paymentMethod, addressId } = req.body;
 
-  // orderNumber;
-  // subtotal;
-  // totalAmount;
-
-  if (!mongoose.Types.ObjectId(userId)) {
-    throw new ApiError(404, "Userid is not proper");
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    throw new ApiError(400, "Invalid userId");
   }
-  const user = await User.find(userId);
+
+  if (!mongoose.Types.ObjectId.isValid(addressId)) {
+    throw new ApiError(400, "Invalid addressId");
+  }
+
+  if (!cartItemIds || cartItemIds.length === 0) {
+    throw new ApiError(400, "Cart items are required");
+  }
+
+  const validPaymentMethods = ["COD", "UPI", "CARD"];
+
+  if (!validPaymentMethods.includes(paymentMethod)) {
+    throw new ApiError(400, "Invalid payment method");
+  }
+
+  const user = await User.findById(userId).lean();
+
   if (!user) {
-    throw new ApiError(404, "User is not found");
+    throw new ApiError(404, "User not found");
   }
 
+  const address = await Address.findById(addressId).lean();
 
-  if (!mongoose.Types.ObjectId(addressId)) {
-    throw new ApiError(404, "addressId is not proper");
-  }
-
-  const address = await Address.find(addressId);
   if (!address) {
-    throw new ApiError(404, "Address is not found");
+    throw new ApiError(404, "Address not found");
   }
 
-  const result = {
-    userId: userId,
+  if (String(address.userId) !== String(userId)) {
+    throw new ApiError(403, "Address does not belong to user");
+  }
+
+  let subTotal = 0;
+  let totalAmount = 0;
+
+  const orderItemPayload = [];
+
+  for (const cartItemId of cartItemIds) {
+    const cartItem = await CartItem.findById(cartItemId).lean();
+
+    if (!cartItem) {
+      throw new ApiError(404, "Cart item not found");
+    }
+
+    const cart = await Cart.findById(cartItem.cartId).lean();
+
+    if (!cart) {
+      throw new ApiError(404, "Cart not found");
+    }
+
+    if (String(cart.userId) !== String(userId)) {
+      throw new ApiError(403, "Cart item does not belong to user");
+    }
+
+    const inventory = await Inventory.findOne({
+      productId: cartItem.productId,
+    }).lean();
+
+    if (!inventory) {
+      throw new ApiError(404, "Inventory not found");
+    }
+
+    if (inventory.stock < cartItem.quantity) {
+      throw new ApiError(400, "Insufficient stock");
+    }
+
+    const lineTotal = cartItem.price * cartItem.quantity;
+
+    subTotal += lineTotal;
+    totalAmount += lineTotal;
+
+    orderItemPayload.push({
+      cartItemId: cartItem._id,
+      productId: cartItem.productId,
+      productName: cartItem.productName,
+      productImage: cartItem.productImage,
+      price: cartItem.price,
+      quantity: cartItem.quantity,
+      totalPrice: lineTotal,
+    });
+  }
+
+  const orderNumber = `ORD-${Date.now()}`;
+
+  const order = await Order.create({
+    userId,
+    addressId,
+    orderNumber,
+    paymentMethod,
+    subTotal,
+    totalAmount,
+  });
+
+  orderItemPayload.forEach((item) => {
+    item.orderId = order._id;
+    delete item.cartItemId;
+  });
+
+  const orderItems = await OrderItem.insertMany(orderItemPayload);
+
+  for (const item of orderItemPayload) {
+    await Inventory.updateOne(
+      {
+        productId: item.productId,
+      },
+      {
+        $inc: {
+          stock: -item.quantity,
+        },
+      },
+    );
+  }
+
+  await CartItem.deleteMany({
+    _id: { $in: cartItemIds },
+  });
+
+  return {
+    orderId: order._id,
+    orderNumber: order.orderNumber,
+    status: order.orderStatus,
+    paymentMethod: order.paymentMethod,
+    subTotal,
+    totalAmount,
+    items: orderItems,
   };
-  return result;
 };
