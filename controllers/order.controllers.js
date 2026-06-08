@@ -23,4 +23,14 @@ const createOrder = async (req, res) => {
   });
 };
 
-module.exports = { createOrder, getOrder };
+const getOrderDetail = async (req, res)=>{
+  const data = await orderService.getOrderDetail(req);
+
+  return res.status(200).json({
+    success: true,
+    message: "Order Detail fetch successfully",
+    data
+  })
+}
+
+module.exports = { createOrder, getOrder, getOrderDetail };

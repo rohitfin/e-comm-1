@@ -146,3 +146,76 @@ exports.createOrder = async (req) => {
     items: orderItems,
   };
 };
+
+/*
+GET /orders/:id
+    Return:
+    •	items
+    •	address
+    •	total
+    •	status
+*/
+
+exports.getOrderDetail = async (req) => {
+  const userId = req.user?._id;
+  const { orderId } = req.params;
+
+  const order = await Order.findById(orderId).lean();
+
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+
+  if (String(userId) !== String(order.userId)) {
+    throw new ApiError(400, "This order not belong to you");
+  }
+
+  const address = await Address.findOne({
+    userId: userId,
+  });
+
+  if (!address || !address._id.equals(order.addressId)) {
+    throw new ApiError(400, "Address not match for the user");
+  }
+
+  const orderItems = await OrderItem.find({ orderId: order._id });
+
+  if (!orderItems) {
+    throw new ApiError(400, "Order Items not found");
+  }
+
+  const result = {
+    orderId: order._id,
+    orderNumber: order.orderNumber,
+    orderStatus: order.orderStatus,
+    orderDate: order.placedAt,
+    shippedAt: order.shippedAt,
+    deliveredAt: order.deliveredAt,
+    cancelledAt: order.cancelledAt,
+    cancelReason: order.cancelReason,
+    paymentMethod: order.paymentMethod,
+    paymentStatus: order.paymentStatus,
+    subTotal: order.subtotal,
+    total: order.totalAmount,
+    address: {
+      line1: address.line1,
+      line2: address.line2,
+      city: address.city,
+      state: address.state,
+      country: address.country,
+      pinCode: address.zip,
+      type: address.type,
+    },
+    items: orderItems.map((item) => ({
+      productId: item.productId,
+      productImage: item.productImage,
+      price: item.price,
+      quantity: item.quantity,
+      totalPrice: item.totalPrice,
+    })),
+  };
+
+  return result;
+
+  return result;
+};
