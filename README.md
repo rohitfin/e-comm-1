@@ -424,7 +424,7 @@ ________________________________________
     Customer only.
 ________________________________________
 25️⃣ Order Detail API
-GET /orders/:id
+GET /orders/:id ✅
     Return:
     •	items
     •	address

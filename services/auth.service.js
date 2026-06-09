@@ -131,7 +131,7 @@ exports.refreshToken = async (req) => {
     const accessExpiryDate = new Date(Date.now() + accessExpiryMs);
 
     // Rotate refresh token
-    const newRefreshToken = crypto.randomBytes(40).toString("hex");
+    const newRefreshToken = crypto.randomBytes(40).toString("hex"); // Rotates refresh token to a random hex (different format than earlier JWT-based refresh token)
 
     session.refreshToken = newRefreshToken;
     session.refreshTokenExpiryAt = new Date(
@@ -176,7 +176,7 @@ exports.refreshToken = async (req) => {
 
     // throw new ApiError(401, "Authentication failed");
 
-    throw error
+    throw error;
   }
 };
 
@@ -192,6 +192,7 @@ exports.logoutAll = async (req) => {
         logoutTime: new Date(),
       },
     },
+    // Intentionally deactivate other active sessions to enforce single-active-session policy
   );
 
   if (result.modifiedCount === 0) {

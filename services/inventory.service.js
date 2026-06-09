@@ -29,14 +29,14 @@ exports.updateInventory = async (req) => {
   const result = await Inventory.findOneAndUpdate(
     { productId: productId },
     { $set: body },
-    { new: true, runValidators: true },
+    { new: true, runValidators: true }, // enforce schema validators on update
   );
 
   return result;
 };
 
 exports.getLowStock = async (req) => {
-  let number = req.params.number
+  let number = req.params.number;
   number = parseInt(number);
   if (isNaN(number)) number = 90;
 

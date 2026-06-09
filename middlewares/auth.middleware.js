@@ -35,7 +35,7 @@ exports.authProtect = async (req, res, next) => {
     }
 
     req.session = session;
-    req.user = decoded; // attach user info
+    req.user = decoded; // attach JWT payload (contains sessionId; not full DB user)
     next();
   } catch (error) {
     // if (error.name === "TokenExpiredError") {

@@ -189,10 +189,7 @@ exports.getCartTotal = async (userId) => {
     };
   });
 
-  const subTotal = items.reduce(
-    (acc, item) => acc + item.subTotal,
-    0
-  );
+  const subTotal = items.reduce((acc, item) => acc + item.subTotal, 0);
 
   const tax = 0;
 
@@ -209,7 +206,6 @@ exports.getCartTotal = async (userId) => {
 };
 
 exports.getAdminCartTotal1 = async () => {
-
   const carts = await Cart.find().lean();
 
   if (carts.length === 0) {
@@ -217,9 +213,7 @@ exports.getAdminCartTotal1 = async () => {
   }
 
   const users = await Promise.all(
-
     carts.map(async (cart) => {
-
       const cartItems = await CartItem.find({
         cartId: cart._id,
       })
@@ -229,9 +223,7 @@ exports.getAdminCartTotal1 = async () => {
       const items = cartItems
         .filter((item) => item.productId)
         .map((item) => {
-
-          const itemSubTotal =
-            item.productId.price * item.quantity;
+          const itemSubTotal = item.productId.price * item.quantity;
 
           return {
             itemId: item._id,
@@ -248,20 +240,13 @@ exports.getAdminCartTotal1 = async () => {
 
       // USER SUMMARY
 
-      const totalItems = items.reduce(
-        (acc, item) => acc + item.quantity,
-        0
-      );
+      const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
 
-      const subTotalItems = items.reduce(
-        (acc, item) => acc + item.subTotal,
-        0
-      );
+      const subTotalItems = items.reduce((acc, item) => acc + item.subTotal, 0);
 
       const taxItems = 0;
 
-      const grandTotalItems =
-        subTotalItems + taxItems;
+      const grandTotalItems = subTotalItems + taxItems;
 
       return {
         userId: cart.userId,
@@ -275,7 +260,7 @@ exports.getAdminCartTotal1 = async () => {
           grandTotalItems,
         },
       };
-    })
+    }),
   );
 
   // OVERALL SUMMARY
@@ -284,21 +269,17 @@ exports.getAdminCartTotal1 = async () => {
 
   const subTotal = users.reduce(
     (acc, user) => acc + user.summary.subTotalItems,
-    0
+    0,
   );
 
-  const tax = users.reduce(
-    (acc, user) => acc + user.summary.taxItems,
-    0
-  );
+  const tax = users.reduce((acc, user) => acc + user.summary.taxItems, 0);
 
   const grandTotal = users.reduce(
     (acc, user) => acc + user.summary.grandTotalItems,
-    0
+    0,
   );
 
   return {
-
     users,
 
     summary: {
@@ -310,24 +291,22 @@ exports.getAdminCartTotal1 = async () => {
   };
 };
 
-exports.getAdminCartTotal = async(req, res)=>{
-
+exports.getAdminCartTotal = async (req, res) => {
   const carts = await Cart.find().lean();
 
-  if(!carts){
+  if (!carts) {
     throw new ApiError(400, "Cart is not found");
   }
 
   const users = await Promise.all(
-    carts.map(async (cart)=>{
-
+    carts.map(async (cart) => {
       let cartItem = await CartItem.find({
-        cartId: cart._id
+        cartId: cart._id,
       })
-      .populate("productId", "name price")
-      .lean()
+        .populate("productId", "name price")
+        .lean();
 
-      let items = await cartItem.map((item)=>{
+      let items = await cartItem.map((item) => {
         const subTotal = item.productId.price * item.quantity;
         // const tax = (item.productId.price * item.tax)/100;
 
@@ -339,49 +318,46 @@ exports.getAdminCartTotal = async(req, res)=>{
           price: item.productId.price,
           quantity: item.quantity,
 
-          subTotal
-        }
-      })
+          subTotal,
+        };
+      });
 
-      const subTotalItem = items.reduce((acc, ele, ind, arr)=>{
-        return acc + ele.subTotal 
-      }, 0)
+      const subTotalItem = items.reduce((acc, ele, ind, arr) => {
+        return acc + ele.subTotal;
+      }, 0);
       const taxItem = 0;
       const grandTotalItem = subTotalItem + taxItem;
 
       return {
-          userId: cart.userId,
-          items,
-          summary: {
-            subTotalItem,
-            taxItem,
-            grandTotalItem
-          }
-      }
+        userId: cart.userId,
+        items,
+        summary: {
+          subTotalItem,
+          taxItem,
+          grandTotalItem,
+        },
+      };
+    }),
+  );
 
-    })
-  )
-
-  const subTotal = users.reduce((acc, ele, ind, arr)=>{
-    return acc + ele.summary.subTotalItem
-  }, 0)
-  const total = users.reduce((acc, ele, ind, arr)=>{
-    return acc + ele.summary.totalItem
-  }, 0)
-  const tax = users.reduce((acc, ele, ind, arr)=>{
-    return acc + ele.summary.taxItem
-  }, 0)
+  const subTotal = users.reduce((acc, ele, ind, arr) => {
+    return acc + ele.summary.subTotalItem;
+  }, 0);
+  const total = users.reduce((acc, ele, ind, arr) => {
+    return acc + ele.summary.totalItem;
+  }, 0);
+  const tax = users.reduce((acc, ele, ind, arr) => {
+    return acc + ele.summary.taxItem;
+  }, 0);
   const grandTotal = total + tax;
-
 
   return {
     users,
-    summary : {
+    summary: {
       subTotal,
       total,
       tax,
-      grandTotal
-    }
+      grandTotal,
+    },
   };
-
-}
+};

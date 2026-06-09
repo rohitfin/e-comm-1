@@ -4,35 +4,39 @@ const loginSessionSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true
+    required: true,
   },
   ipAddress: String,
   userAgent: String,
   loginTime: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   logoutTime: Date,
   isActive: {
     type: Boolean,
-    default: true
+    default: true,
   },
   refreshToken: {
     type: String,
-    required: true
+    required: true,
   },
-  refreshTokenExpiryAt:{
+  refreshTokenExpiryAt: {
     type: String,
-    required: true
-  },
-  accessTokenExpiryAt:{
+    required: true,
+  }, // stored as String in schema; code may store Date objects — watch for type mismatch
+  accessTokenExpiryAt: {
     type: String,
-    required: true
-  },
+    required: true,
+  }, // stored as String in schema; code may store Date objects — watch for type mismatch
   lastActivity: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
 });
 
-module.exports = mongoose.model("LoginSession", loginSessionSchema, "tbl_login_sessions");
+module.exports = mongoose.model(
+  "LoginSession",
+  loginSessionSchema,
+  "tbl_login_sessions",
+);

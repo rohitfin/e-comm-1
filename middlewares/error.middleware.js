@@ -16,11 +16,10 @@ const errorHandler = (err, req, res, next) => {
 
   // Mongo Duplicate Key Error
   if (err.code === 11000) {
+    // Normalize duplicate-key into safe 400 and expose only offending field
     status = 400;
     const field = Object.keys(err.keyValue || {})[0];
-    message = field
-      ? `${field} already exists`
-      : "Duplicate field value";
+    message = field ? `${field} already exists` : "Duplicate field value";
   }
 
   // Mongoose CastError (invalid ObjectId)
@@ -31,6 +30,7 @@ const errorHandler = (err, req, res, next) => {
 
   // JWT Errors (from jsonwebtoken)
   if (err.name === "JsonWebTokenError") {
+    // Treat JWT parsing failures as 401 to avoid leaking token internals
     status = 401;
     message = "Authentication failed";
   }
